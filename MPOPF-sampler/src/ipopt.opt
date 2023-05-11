@@ -1,0 +1,9 @@
+max_cpu_time             864000
+mu_strategy              adaptive
+print_user_options       yes
+print_timing_statistics  yes
+linear_solver            ma27
+tol                      1e-6
+least_square_init_duals  yes
+warm_start_init_point    yes
+linear_scaling_on_deman  no

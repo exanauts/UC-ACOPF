@@ -19,8 +19,8 @@ function solve_mpacopf_reduced_loads(case::String, load_prefix::String;
             use_gpu=use_gpu, use_linelimit=use_linelimit,
             load_prefix=load_prefix, tight_factor=tight_factor, gpu_no=gpu_no, verbose=verbose)
 
-    env.load.pd ./= 8
-    env.load.qd ./= 8
+    env.load.pd ./= 3
+    env.load.qd ./= 3
 
     mod = ExaAdmm.ModelMpacopf{T,TD,TI,TM}(env; start_period=start_period, end_period=end_period, ramp_ratio=ramp_ratio, on_status=on_status, switch_on=switch_on, switch_off=switch_off)
 
@@ -64,8 +64,8 @@ function solve_ucmp_reduced_loads(case::String, load_prefix::String, gen_prefix:
             storage_ratio=storage_ratio, storage_charge_max=storage_charge_max,
             verbose=verbose)
             
-    env.load.pd ./= 8
-    env.load.qd ./= 8
+    env.load.pd ./= 3
+    env.load.qd ./= 3
         
     mod = ExaAdmm.UCMPModel{T,TD,TI,TM}(env, gen_prefix; start_period=start_period, end_period=end_period, ramp_ratio=ramp_ratio)
 

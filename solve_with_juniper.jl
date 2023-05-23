@@ -5,21 +5,24 @@ using Ipopt, HiGHS
 include("MPOPF-sampler/src/mpc_data.jl")
 include("jump_models.jl")
 
-# case = "case9"
-case = "case118"
+case = "case9"
+# case = "case118"
+gen_scenario = "$(case)_gen"
+# gen_scenario = "$(case)_gen_initial_all_on"
 
 T = 12
 circuit = getcircuit("data/$(case)", 100, 0.1)
 load = getload("data/multiperiod_data/$(case)_onehour_168", circuit)
+load.pd ./= 3
+load.qd ./= 3
 
-
-v0 = readdlm("data/multiperiod_data/$(case)_gen.v0", Int)
-hu = readdlm("data/multiperiod_data/$(case)_gen.hu", Int)
-hd = readdlm("data/multiperiod_data/$(case)_gen.hd", Int)
-tu = readdlm("data/multiperiod_data/$(case)_gen.tu", Int)
-td = readdlm("data/multiperiod_data/$(case)_gen.td", Int)
-con = readdlm("data/multiperiod_data/$(case)_gen.con")
-coff = readdlm("data/multiperiod_data/$(case)_gen.coff")
+v0 = readdlm("data/multiperiod_data/$(gen_scenario).v0", Int)
+hu = readdlm("data/multiperiod_data/$(gen_scenario).hu", Int)
+hd = readdlm("data/multiperiod_data/$(gen_scenario).hd", Int)
+tu = readdlm("data/multiperiod_data/$(gen_scenario).tu", Int)
+td = readdlm("data/multiperiod_data/$(gen_scenario).td", Int)
+con = readdlm("data/multiperiod_data/$(gen_scenario).con")
+coff = readdlm("data/multiperiod_data/$(gen_scenario).coff")
 
 
 model = get_ucmodel(circuit, load, T, v0, tu, td, hu, hd, con, coff)

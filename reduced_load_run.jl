@@ -19,12 +19,13 @@ function solve_ucmp_then_fix_and_solve_mpacopf(file, load_file, gen_prefix)
     println("ucmpmodel objective value: $(ucmpmodel.info.objval)")
 end
 
-case = "case118"
-file = "/home/wzhang483/gpu_acopf/data/$(case).m"
-load_file = "/home/wzhang483/gpu_acopf/data/multiperiod_data/$(case)_onehour_168"
-gen_prefix = "/home/wzhang483/gpu_acopf/data/multiperiod_data/$(case)_gen"
+case = "case9"
+file = "/home/wzhang483/UC-ACOPF/data/$(case).m"
+load_file = "/home/wzhang483/UC-ACOPF/data/multiperiod_data/$(case)_onehour_168"
+gen_prefix = "/home/wzhang483/UC-ACOPF/data/multiperiod_data/$(case)_gen_initial_all_on"
 
-solve_ucmp_then_fix_and_solve_mpacopf(file, load_file, gen_prefix)
+# solve_ucmp_then_fix_and_solve_mpacopf(file, load_file, gen_prefix)
 
 # To directly solve ucmp, run as follows with large enough outer_iterlim and inner_iterlim
-# env, ucmpmodel = solve_ucmp_reduced_loads(file, load_file, gen_prefix; ramp_ratio=0.1, rho_pq=1e3, rho_va=1e5, rho_uc=1e3, outer_iterlim=1000, inner_iterlim=200, start_period=1, end_period=6, scale=1e-4, tight_factor=0.99, use_gpu=use_gpu, verbose=1);
+use_gpu = false
+env, ucmpmodel = solve_ucmp_reduced_loads(file, load_file, gen_prefix; ramp_ratio=0.1, rho_pq=1e5, rho_va=1e3, rho_uc=1e3, outer_iterlim=1000, inner_iterlim=200, start_period=1, end_period=12, scale=1e-4, tight_factor=0.99, use_gpu=use_gpu, verbose=1);

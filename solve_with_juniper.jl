@@ -8,13 +8,12 @@ include("jump_models.jl")
 case = "case9"
 # case = "case118"
 gen_scenario = "$(case)_gen"
-# gen_scenario = "$(case)_gen_initial_all_on"
 
-T = 12
+T = 6
 circuit = getcircuit("data/$(case)", 100, 0.1)
 load = getload("data/multiperiod_data/$(case)_onehour_168", circuit)
-load.pd ./= 3
-load.qd ./= 3
+# load.pd ./= 3
+# load.qd ./= 3
 
 v0 = readdlm("data/multiperiod_data/$(gen_scenario).v0", Int)
 hu = readdlm("data/multiperiod_data/$(gen_scenario).hu", Int)

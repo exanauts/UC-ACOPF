@@ -38,6 +38,15 @@ CUDA.@sync @cuda threads=64 blocks=1 ExaAdmm.eval_h_generator_continuous_kernel_
     param_d, scale, c2, c1, c0, BaseMVa
 )
 
+# Check symmetry of gpu Hessian
+function check_gpu_hessian_symmetry(H_gpu)
+    for i in 1:13
+        for j in (i+1):13
+            @assert H_gpu[i,j] == H_gpu[j,i]
+        end
+    end
+end
+
 # Equivalence check
 function check_cpu_gpu_hessian_equivalence(rows, cols, values, H_gpu)
     d = Dict( (rows[i], cols[i]) => i for i in 1:length(values) )
@@ -59,5 +68,7 @@ function check_cpu_gpu_hessian_equivalence(rows, cols, values, H_gpu)
         end
     end
 end
-# This will print out nothing if no difference is detected
+
+# This will print out nothing if no difference is detected, and gpu hessian is symmetric
+check_gpu_hessian_symmetry(H_gpu)
 check_cpu_gpu_hessian_equivalence(rows, cols, values, H_gpu)

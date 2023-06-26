@@ -219,7 +219,7 @@ function get_ucmodel(circuit, demand, T,
     @variable(m, u_su[g=1:num_gens,t=1:T], Bin)
     @variable(m, u_sd[g=1:num_gens,t=1:T], Bin)
     @constraint(m, uc_state_init[g=1:num_gens], v0[g] - u_on[g,1] + u_su[g,1] - u_sd[g,1] == 0)
-    @constraint(m, uc_state[g=1:num_gens,t=1:T-1], u_on[g,t] - u_on[g,t+1] + u_su[g,t] - u_sd[g,t] == 0)
+    @constraint(m, uc_state[g=1:num_gens,t=1:T-1], u_on[g,t] - u_on[g,t+1] + u_su[g,t+1] - u_sd[g,t+1] == 0)
     @constraint(m, initial_on[g=1:num_gens], sum(1-u_on[g,t] for t in 1:hu[g]) == 0)
     @constraint(m, initial_off[g=1:num_gens], sum(u_on[g,t] for t in 1:hd[g]) == 0)
     # @constraint(m, min_ontime[g=1:num_gens,t=tu[g]:T], sum(u_su[g,t] for i in t-tu[g]+1:t) <= u_on[g,t])

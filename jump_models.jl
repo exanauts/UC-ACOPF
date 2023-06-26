@@ -2,7 +2,7 @@ using JuMP
 using DelimitedFiles
 function get_mpcmodel(circuit, demand, T; has_ramping=true,
                       phase1=false, piecewise=false,
-                      prev_val=nothing, u_on=nothing, u_su=nothing, u_sd=nothing)
+                      prev_val=nothing, u_on=nothing, u_su=nothing, u_sd=nothing, con=nothing, coff=nothing)
     #=
     Args:
         circuit - Circuit instance
@@ -65,16 +65,17 @@ function get_mpcmodel(circuit, demand, T; has_ramping=true,
             + gencost2[g] * (baseMVA * Pg[t,g])
             + gencost3[g]
     =#
+    uc_cost = sum(con[g] * sum(u_su[g,t] for t=1:T) + coff[g] * sum(u_sd[g,t] for t=1:T) for g=1:num_gens)
     if piecewise
         @variable(m, Cg[t=1:T,g=1:num_gens])
-        @NLobjective(m, Min, sum(Cg[t,g] for t=1:T,g=1:num_gens))
+        @NLobjective(m, Min, sum(Cg[t,g] for t=1:T,g=1:num_gens) + uc_cost)
         @constraint(m, plcurve[t=1:T,g=1:num_gens,p=1:gen[g].n-1],
 		    Cg[t,g] - (((gen[g].coeff[2*p+2] - gen[g].coeff[2*p])/(gen[g].coeff[2*p+1] - gen[g].coeff[2*p-1]))*(baseMVA*Pg[t,g] - gen[g].coeff[2*p-1]) + gen[g].coeff[2*p]) >= 0
                    )
     else
         @NLobjective(m, Min, sum(gen[g].coeff[gen[g].n-2]*(baseMVA*Pg[t,g])^2
                                 + gen[g].coeff[gen[g].n-1]*(baseMVA*Pg[t,g])
-                                + gen[g].coeff[gen[g].n] for t=1:T,g=1:num_gens))
+                                + gen[g].coeff[gen[g].n] for t=1:T,g=1:num_gens) + uc_cost)
     end
 
     # Ramping up/down constraints
@@ -381,8 +382,8 @@ function solve_multiperiod(circuit, load, T)
     return model
 end
 
-function solve_multiperiod_with_uc(circuit, load, T, u_on, u_su, u_sd)
-    model = get_mpcmodel(circuit, load, T, u_on=u_on, u_su=u_su, u_sd=u_sd)
+function solve_multiperiod_with_uc(circuit, load, T, u_on, u_su, u_sd, con, coff)
+    model = get_mpcmodel(circuit, load, T, u_on=u_on, u_su=u_su, u_sd=u_sd, con=con, coff=coff)
     set_optimizer(model, Ipopt.Optimizer)
     optimize!(model)
     return model

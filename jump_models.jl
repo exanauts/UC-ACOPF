@@ -181,7 +181,7 @@ function get_ucmodel(circuit, demand, T,
                      v0, tu, td, hu, hd, con, coff; 
                      has_ramping=true,
                      phase1=false, piecewise=false,
-                     prev_val=nothing)
+                     prev_val=nothing, cont_relax=false)
     #=
     Args:
         circuit - Circuit instance
@@ -216,9 +216,15 @@ function get_ucmodel(circuit, demand, T,
     u_su[g,t]: generator g is started up at time t
     u_sd[g,t]: generator g is shut down at time t
     =#
-    @variable(m, u_on[g=1:num_gens,t=1:T], Bin)
-    @variable(m, u_su[g=1:num_gens,t=1:T], Bin)
-    @variable(m, u_sd[g=1:num_gens,t=1:T], Bin)
+    if cont_relax
+        @variable(m, u_on[g=1:num_gens,t=1:T], lower_bound=0, upper_bound=1)
+        @variable(m, u_su[g=1:num_gens,t=1:T], lower_bound=0, upper_bound=1)
+        @variable(m, u_sd[g=1:num_gens,t=1:T], lower_bound=0, upper_bound=1)
+    else
+        @variable(m, u_on[g=1:num_gens,t=1:T], Bin)
+        @variable(m, u_su[g=1:num_gens,t=1:T], Bin)
+        @variable(m, u_sd[g=1:num_gens,t=1:T], Bin)
+    end
     @constraint(m, uc_state_init[g=1:num_gens], v0[g] - u_on[g,1] + u_su[g,1] - u_sd[g,1] == 0)
     @constraint(m, uc_state[g=1:num_gens,t=1:T-1], u_on[g,t] - u_on[g,t+1] + u_su[g,t+1] - u_sd[g,t+1] == 0)
     @constraint(m, initial_on[g=1:num_gens], sum(1-u_on[g,t] for t in 1:hu[g]) == 0)
